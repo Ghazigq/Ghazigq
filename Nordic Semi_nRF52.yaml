@@ -1,0 +1,234 @@
+---
+vendor: Ghazigq
+dvendor: Nordic Semi
+name: nRF52
+version: 0.0.1
+yaml_version: 1
+type: Chip_Support_Packages
+family_name: Nordic
+series:
+  description: nordic ble soc
+  series_name: nRF52
+  peripheral: {}
+  sub_series:
+  - sub_series_name: nRF52832
+    chips:
+    - chip_name: nRF52832_xxAA
+      peripheral: {}
+      memory:
+      - id: IROM1
+        start: '0x00000000'
+        size: '0x00080000'
+        default: '1'
+      - id: IRAM1
+        start: '0x20000000'
+        size: '0x00010000'
+        init: '0'
+        default: '1'
+      cpu_info:
+        max_clock: '64000000'
+        fpu: '0'
+        mpu: '0'
+        endian: Little-endian
+      compiler:
+        gcc:
+          entry_point: entry
+          link_script: linkscripts\nRF52832_xxAA\link.lds
+          marco:
+          - nRF52832_xxAA
+          files:
+          - \libraries\cmsis\include\core_cm4.h
+          - libraries\nrfx\mdk\gcc_startup_nrf52.S
+          - libraries\nrfx\mdk\system_nrf52.c
+        armcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+        iarcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+    - chip_name: nRF52832_xxAB
+      peripheral: {}
+      memory:
+      - id: IROM1
+        start: '0x00000000'
+        size: '0x00040000'
+        default: '1'
+      - id: IRAM1
+        start: '0x20000000'
+        size: '0x00008000'
+        init: '0'
+        default: '1'
+      cpu_info:
+        max_clock: '64000000'
+        fpu: '0'
+        mpu: '0'
+        endian: Little-endian
+      compiler:
+        gcc:
+          entry_point: entry
+          link_script: linkscripts\nRF52832_xxAB\link.lds
+          marco:
+          - nRF52832_xxAB
+          files:
+          - \libraries\cmsis\include\core_cm4.h
+          - libraries\nrfx\mdk\gcc_startup_nrf52.S
+          - libraries\nrfx\mdk\system_nrf52.c
+        armcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+        iarcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+    ui:
+      uart:
+        default_value: UART1
+        prompt_message_en: select one uart as console output interface
+        prompt_message_zh: 选择一个串口作为控制台信息输出接口
+      tx_pin:
+        default_value: 31
+        prompt_message_en: 'set the tx pin name of the console device interface, the
+          value should be with a format"P+[port name][pin number]",eg. PA9 '
+        prompt_message_zh: 设置控制台设备的数据发送引脚的名称
+      rx_pin:
+        default_value: 30
+        prompt_message_en: 'set the rx pin name of the console device interface, the
+          value should be with a format"P+[port name][pin number]", eg. PA10 '
+        prompt_message_zh: 设置控制台设备的数据发送引脚的名称
+    docs:
+    - file: Documents\nRF52832_OPS.pdf
+      title: nRF52832 Datasheet
+    svd:
+      file: debug\svd\nrf52.svd
+    project_type:
+      bare_metal:
+        function_map:
+          clk_init: none
+          uart_init: none
+          putc: none
+          sysTick: none
+        marco:
+        - SOC_SERIES_NRF
+        source_files:
+        - drivers\baremetal
+      rtt_nano:
+        function_map:
+          clk_init: none
+          uart_init: none
+          putc: none
+          getc: none
+          sysTick: none
+          heap_init: none
+        marco:
+        - SOC_SERIES_NRF
+        source_files:
+        - drivers\nano
+      rtt:
+        function_map:
+          rt_hw_board_init;: none
+          rt_hw_serial_register: none
+          rt_hw_pin_register: none
+          heap_init: none
+        marco:
+        - SOC_SERIES_NRF
+        source_files:
+        - drivers\rtt
+  - sub_series_name: nRF52840
+    chips:
+    - chip_name: nRF52840_xxAA
+      peripheral: {}
+      memory:
+      - id: IROM1
+        start: '0x00000000'
+        size: '0x00100000'
+        default: '1'
+      - id: IRAM1
+        start: '0x20000000'
+        size: '0x00040000'
+        init: '0'
+        default: '1'
+      cpu_info:
+        max_clock: '64000000'
+        fpu: '0'
+        mpu: '0'
+        endian: Little-endian
+      compiler:
+        gcc:
+          entry_point: entry
+          link_script: linkscripts\nRF52840_xxAA\link.lds
+          marco:
+          - nRF52840_xxAA
+          files:
+          - \libraries\cmsis\include\core_cm4.h
+          - libraries\nrfx\mdk\gcc_startup_nrf52840.S
+          - libraries\nrfx\mdk\system_nrf52840.c
+        armcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+        iarcc:
+          entry_point: none
+          link_script: none
+          marco: []
+          files: []
+    ui:
+      uart:
+        default_value: UART1
+        prompt_message_en: select one uart as console output interface
+        prompt_message_zh: 选择一个串口作为控制台信息输出接口
+      tx_pin:
+        default_value: 31
+        prompt_message_en: 'set the tx pin name of the console device interface, the
+          value should be with a format"P+[port name][pin number]",eg. PA9 '
+        prompt_message_zh: 设置控制台设备的数据发送引脚的名称
+      rx_pin:
+        default_value: 30
+        prompt_message_en: 'set the rx pin name of the console device interface, the
+          value should be with a format"P+[port name][pin number]", eg. PA10 '
+        prompt_message_zh: 设置控制台设备的数据发送引脚的名称
+    docs:
+    - file: Documents\nRF52832_OPS.pdf
+      title: nRF52840 Datasheet
+    svd:
+      file: debug\svd\nrf52840.svd
+    project_type:
+      bare_metal:
+        function_map:
+          clk_init: none
+          uart_init: none
+          putc: none
+          sysTick: none
+        marco:
+        - SOC_SERIES_NRF52840_XXAA
+        source_files:
+        - drivers\baremetal
+      rtt_nano:
+        function_map:
+          clk_init: none
+          uart_init: none
+          putc: none
+          getc: none
+          sysTick: none
+          heap_init: none
+        marco:
+        - SOC_SERIES_NRF52840_XXAA
+        source_files:
+        - drivers\nano
+      rtt:
+        function_map:
+          rt_hw_board_init;: none
+          rt_hw_serial_register: none
+          rt_hw_pin_register: none
+          heap_init: none
+        marco:
+        - SOC_SERIES_NRF52840_XXAA
+        source_files:
+        - drivers\rtt
