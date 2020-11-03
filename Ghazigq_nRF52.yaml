@@ -1,20 +1,22 @@
 ---
 vendor: Ghazigq
-dvendor: Nordic Semi
+dvendor: Nordic-Semi
 name: nRF52
 version: 0.0.1
 yaml_version: 1
 type: Chip_Support_Packages
 family_name: Nordic
 series:
-  description: nordic ble soc
+  description: |-
+    nordic ble soc
   series_name: nRF52
   cpu_info:
-        core: Cortex-M4
-        fpu: DP_FPU
-        mpu: '0'
-        endian: Little-endian
-  files:
+    core: Cortex-M4
+    fpu: DP_FPU
+    mpu: '0'
+    endian: Little-endian
+  source_files:
+    files:
       - libraries\nrfx\hal
       - libraries\nrfx\drivers\include
       - libraries\nrfx\drivers\src
