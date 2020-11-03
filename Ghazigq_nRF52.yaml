@@ -2,7 +2,7 @@
 vendor: Ghazigq
 dvendor: Nordic-Semi
 name: nRF52
-version: 0.0.1
+version: 0.0.3
 yaml_version: 1
 type: Chip_Support_Packages
 family_name: Nordic
@@ -10,22 +10,9 @@ series:
   description: |-
     nordic ble soc
   series_name: nRF52
-  cpu_info:
-    core: Cortex-M4
-    fpu: DP_FPU
-    mpu: '0'
-    endian: Little-endian
-  source_files:
-    files:
-      - libraries\nrfx\hal
-      - libraries\nrfx\drivers\include
-      - libraries\nrfx\drivers\src
-      - libraries\nrfx\drivers\src\prs
-      - libraries\nrfx\templates
+  peripheral: {}
   sub_series:
   - sub_series_name: nRF52832
-    cpu_info:
-        max_clock: '64000000'
     chips:
     - chip_name: nRF52832_xxAA
       peripheral: {}
@@ -39,6 +26,12 @@ series:
         size: '0x00010000'
         init: '0'
         default: '1'
+      cpu_info:
+        max_clock: '64000000'        
+        core: Cortex-M4
+        fpu: DP_FPU
+        mpu: '0'
+        endian: Little-endian       
       compiler:
         gcc:
           entry_point: entry
@@ -72,6 +65,12 @@ series:
         size: '0x00008000'
         init: '0'
         default: '1'
+      cpu_info:
+        max_clock: '64000000'          
+        core: Cortex-M4
+        fpu: DP_FPU
+        mpu: '0'
+        endian: Little-endian  
       compiler:
         gcc:
           entry_point: entry
@@ -109,7 +108,7 @@ series:
           value should be with a format"P+[port name][pin number]", eg. PA10 '
         prompt_message_zh: 设置控制台设备的数据发送引脚的名称
     docs:
-    - file: Documents\nRF52832_OPS.pdf
+    - file: documents\nRF52832_OPS.pdf
       title: nRF52832 Datasheet
     svd:
       file: debug\svd\nrf52.svd
@@ -147,8 +146,6 @@ series:
         source_files:
         - drivers\rtt
   - sub_series_name: nRF52840
-    cpu_info:
-        max_clock: '64000000'
     chips:
     - chip_name: nRF52840_xxAA
       peripheral: {}
@@ -162,6 +159,12 @@ series:
         size: '0x00040000'
         init: '0'
         default: '1'
+      cpu_info:
+        max_clock: '64000000'               
+        core: Cortex-M4
+        fpu: DP_FPU
+        mpu: '0'
+        endian: Little-endian                             
       compiler:
         gcc:
           entry_point: entry
@@ -199,7 +202,7 @@ series:
           value should be with a format"P+[port name][pin number]", eg. PA10 '
         prompt_message_zh: 设置控制台设备的数据发送引脚的名称
     docs:
-    - file: Documents\nRF52832_OPS.pdf
+    - file: documents\nRF52832_OPS.pdf
       title: nRF52840 Datasheet
     svd:
       file: debug\svd\nrf52840.svd
