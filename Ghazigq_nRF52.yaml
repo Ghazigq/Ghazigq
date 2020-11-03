@@ -2,7 +2,7 @@
 vendor: Ghazigq
 dvendor: Nordic-Semi
 name: nRF52
-version: 0.0.3
+version: 0.0.4
 yaml_version: 1
 type: Chip_Support_Packages
 family_name: Nordic
