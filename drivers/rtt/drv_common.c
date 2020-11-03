@@ -5,11 +5,98 @@
  *
  * Change Logs:
  * Date           Author       Notes
- * 2018-11-7      SummerGift   first version
+ * 2020-11-03     Ghazigq   first version
  */
 
 #include "drv_common.h"
 #include "board.h"
+
+#define OSTICK_CLOCK_HZ  ( 32768UL )
+#define COUNTER_MAX 0x00ffffff
+#define CYC_PER_TICK (OSTICK_CLOCK_HZ / RT_TICK_PER_SECOND)
+#define MAX_TICKS ((COUNTER_MAX - CYC_PER_TICK) / CYC_PER_TICK)
+#define MIN_DELAY 32
+
+#define TICK_RATE_HZ  RT_TICK_PER_SECOND
+
+#define NRF_RTC_REG        NRF_RTC1
+/* IRQn used by the selected RTC */
+#define NRF_RTC_IRQn       RTC1_IRQn
+
+static uint32_t last_count;
+
+static uint32_t counter_sub(uint32_t a, uint32_t b)
+{
+    return (a - b) & COUNTER_MAX;
+}
+
+static void set_comparator(uint32_t cyc)
+{
+    nrf_rtc_cc_set(NRF_RTC_REG, 0, cyc & COUNTER_MAX);
+}
+
+void RTC1_IRQHandler(void)
+{
+    uint32_t t, dticks, next;
+
+    NRF_RTC_REG->EVENTS_COMPARE[0] = 0;
+
+    t = nrf_rtc_counter_get(NRF_RTC_REG);
+    dticks = counter_sub(t, last_count) / CYC_PER_TICK;
+    last_count += dticks * CYC_PER_TICK;
+    next = last_count + CYC_PER_TICK;
+
+    if ((int32_t)(next - t) < MIN_DELAY)
+    {
+        next += CYC_PER_TICK;
+    }
+    set_comparator(next);
+
+    rt_tick_increase();
+}
+
+uint32_t _timer_cycle_get_32(void)
+{
+    // k_spinlock_key_t key = k_spin_lock(&lock);
+    uint32_t ret = counter_sub(nrf_rtc_counter_get(NRF_RTC_REG), last_count) + last_count;
+
+    // k_spin_unlock(&lock, key);
+    return ret;
+}
+
+/* SysTick configuration */
+void rt_hw_systick_init(void)
+{
+    nrf_rtc_prescaler_set(NRF_RTC_REG, 0);
+
+    nrf_rtc_cc_set(NRF_RTC_REG, 0, CYC_PER_TICK);
+    nrf_rtc_event_enable(NRF_RTC_REG, RTC_EVTENSET_COMPARE0_Msk);
+    nrf_rtc_int_enable(NRF_RTC_REG, RTC_INTENSET_COMPARE0_Msk);
+
+    /* Clear the event flag and possible pending interrupt */
+    nrf_rtc_event_clear(NRF_RTC_REG, NRF_RTC_EVENT_COMPARE_0);
+    NVIC_ClearPendingIRQ(NRF_RTC_IRQn);
+
+    NVIC_SetPriority(NRF_RTC_IRQn, 1);
+    NVIC_EnableIRQ(NRF_RTC_IRQn);
+
+    nrf_rtc_task_trigger(NRF_RTC_REG, NRF_RTC_TASK_CLEAR);
+    nrf_rtc_task_trigger(NRF_RTC_REG, NRF_RTC_TASK_START);
+
+    set_comparator(nrf_rtc_counter_get(NRF_RTC_REG) + CYC_PER_TICK);
+}
+
+
+/**
+ * This function will delay for some us.
+ *
+ * @param us the delay time of us
+ */
+RT_WEAK void rt_hw_us_delay(rt_uint32_t us)
+{
+
+}
+
 
 #ifdef RT_USING_FINSH
 #include <finsh.h>
@@ -19,131 +106,3 @@ static void reboot(uint8_t argc, char **argv)
 }
 FINSH_FUNCTION_EXPORT_ALIAS(reboot, __cmd_reboot, Reboot System);
 #endif /* RT_USING_FINSH */
-
-/* SysTick configuration */
-void rt_hw_systick_init(void)
-{
-#if defined (SOC_SERIES_STM32H7)
-    HAL_SYSTICK_Config((HAL_RCCEx_GetD1SysClockFreq()) / RT_TICK_PER_SECOND);
-#else
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / RT_TICK_PER_SECOND);
-#endif
-    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-    HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-}
-
-/**
- * This is the timer interrupt service routine.
- *
- */
-void SysTick_Handler(void)
-{
-    /* enter interrupt */
-    rt_interrupt_enter();
-
-    HAL_IncTick();
-    rt_tick_increase();
-
-    /* leave interrupt */
-    rt_interrupt_leave();
-}
-
-uint32_t HAL_GetTick(void)
-{
-    return rt_tick_get() * 1000 / RT_TICK_PER_SECOND;
-}
-
-void HAL_SuspendTick(void)
-{
-}
-
-void HAL_ResumeTick(void)
-{
-}
-
-void HAL_Delay(__IO uint32_t Delay)
-{
-}
-
-/* re-implement tick interface for STM32 HAL */
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-    /* Return function status */
-    return HAL_OK;
-}
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-void _Error_Handler(char *s, int num)
-{
-    /* USER CODE BEGIN Error_Handler */
-    /* User can add his own implementation to report the HAL error return state */
-    while(1)
-    {
-    }
-    /* USER CODE END Error_Handler */
-}
-
-/**
- * This function will delay for some us.
- *
- * @param us the delay time of us
- */
-void rt_hw_us_delay(rt_uint32_t us)
-{
-    rt_uint32_t start, now, delta, reload, us_tick;
-    start = SysTick->VAL;
-    reload = SysTick->LOAD;
-    us_tick = SystemCoreClock / 1000000UL;
-    do {
-        now = SysTick->VAL;
-        delta = start > now ? start - now : reload + start - now;
-    } while(delta < us_tick * us);
-}
-
-/**
- * This function will initial STM32 board.
- */
-void hw_board_init(char *clock_src, int32_t clock_src_freq, int32_t clock_target_freq)
-{
-    extern void rt_hw_systick_init(void);
-    extern void clk_init(char *clk_source, int source_freq, int target_freq);
-
-#ifdef SCB_EnableICache
-    /* Enable I-Cache---------------------------------------------------------*/
-    SCB_EnableICache();
-#endif
-
-#ifdef SCB_EnableDCache
-    /* Enable D-Cache---------------------------------------------------------*/
-    SCB_EnableDCache();
-#endif
-
-    /* HAL_Init() function is called at the beginning of the program */
-    HAL_Init();
-
-    /* enable interrupt */
-    __set_PRIMASK(0);
-    /* System clock initialization */
-    clk_init(clock_src, clock_src_freq, clock_target_freq);
-    /* disbale interrupt */
-    __set_PRIMASK(1);
-
-    rt_hw_systick_init();
-
-    /* Pin driver initialization is open by default */
-#ifdef RT_USING_PIN
-    extern int rt_hw_pin_init(void);
-    rt_hw_pin_init();
-#endif
-
-    /* USART driver initialization is open by default */
-#ifdef RT_USING_SERIAL
-    extern int rt_hw_usart_init(void);
-    rt_hw_usart_init();
-#endif
-
-}

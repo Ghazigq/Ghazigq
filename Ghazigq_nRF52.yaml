@@ -9,9 +9,21 @@ family_name: Nordic
 series:
   description: nordic ble soc
   series_name: nRF52
-  peripheral: {}
+  cpu_info:
+        core: Cortex-M4
+        fpu: DP_FPU
+        mpu: '0'
+        endian: Little-endian
+  files:
+      - libraries\nrfx\hal
+      - libraries\nrfx\drivers\include
+      - libraries\nrfx\drivers\src
+      - libraries\nrfx\drivers\src\prs
+      - libraries\nrfx\templates
   sub_series:
   - sub_series_name: nRF52832
+    cpu_info:
+        max_clock: '64000000'
     chips:
     - chip_name: nRF52832_xxAA
       peripheral: {}
@@ -25,11 +37,6 @@ series:
         size: '0x00010000'
         init: '0'
         default: '1'
-      cpu_info:
-        max_clock: '64000000'
-        fpu: '0'
-        mpu: '0'
-        endian: Little-endian
       compiler:
         gcc:
           entry_point: entry
@@ -37,9 +44,10 @@ series:
           marco:
           - nRF52832_xxAA
           files:
-          - \libraries\cmsis\include\core_cm4.h
+          - libraries\cmsis\include\core_cm4.h
           - libraries\nrfx\mdk\gcc_startup_nrf52.S
           - libraries\nrfx\mdk\system_nrf52.c
+          - libraries\nrfx\templates\nRF52832
         armcc:
           entry_point: none
           link_script: none
@@ -62,11 +70,6 @@ series:
         size: '0x00008000'
         init: '0'
         default: '1'
-      cpu_info:
-        max_clock: '64000000'
-        fpu: '0'
-        mpu: '0'
-        endian: Little-endian
       compiler:
         gcc:
           entry_point: entry
@@ -74,9 +77,10 @@ series:
           marco:
           - nRF52832_xxAB
           files:
-          - \libraries\cmsis\include\core_cm4.h
+          - libraries\cmsis\include\core_cm4.h
           - libraries\nrfx\mdk\gcc_startup_nrf52.S
           - libraries\nrfx\mdk\system_nrf52.c
+          - libraries\nrfx\templates\nRF52832
         armcc:
           entry_point: none
           link_script: none
@@ -141,6 +145,8 @@ series:
         source_files:
         - drivers\rtt
   - sub_series_name: nRF52840
+    cpu_info:
+        max_clock: '64000000'
     chips:
     - chip_name: nRF52840_xxAA
       peripheral: {}
@@ -154,11 +160,6 @@ series:
         size: '0x00040000'
         init: '0'
         default: '1'
-      cpu_info:
-        max_clock: '64000000'
-        fpu: '0'
-        mpu: '0'
-        endian: Little-endian
       compiler:
         gcc:
           entry_point: entry
@@ -166,9 +167,10 @@ series:
           marco:
           - nRF52840_xxAA
           files:
-          - \libraries\cmsis\include\core_cm4.h
+          - libraries\cmsis\include\core_cm4.h
           - libraries\nrfx\mdk\gcc_startup_nrf52840.S
           - libraries\nrfx\mdk\system_nrf52840.c
+          - libraries\nrfx\templates\nRF52840
         armcc:
           entry_point: none
           link_script: none
